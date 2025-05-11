@@ -13,8 +13,16 @@ DEVICE_ID   = 0          # 摄像头索引
 FRAME_RATE  = 20         # FPS
 LOG_FILE    = "actions.log"
 TIMEOUT_S   = 10         # HTTP 超时
+RESOLUTION = 256
 json_numpy.patch()
 # —————————————————————————————————————————————
+def crop_center_square(image):
+    h, w = image.shape[:2]
+    min_dim = min(h,w)
+    start_x = w//2 - min_dim//2
+    start_y = h//2 - min_dim//2
+    return image[start_y: start_y+min_dim, start_x: start_x + min_dim]
+
 
 logging.basicConfig(
     filename=LOG_FILE,
@@ -55,7 +63,8 @@ def run_instruction(cap: cv2.VideoCapture, instruction: str):
             print("读取相机失败，跳过本帧")
             continue
 
-        frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
+        frame_reshaped = cv2.resize(crop_center_square(frame_bgr), (RESOLUTION,RESOLUTION))
+        frame_rgb = cv2.cvtColor(frame_reshaped, cv2.COLOR_BGR2RGB)
 
         payload = {
             "image": frame_rgb,
@@ -100,3 +109,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+import requests
+import json_numpy
+json_numpy.patch()
+import numpy as np
+import time
+#pip install opencv-python
+import cv2
+import matplotlib.pyplot as plt
+
+
+
+
