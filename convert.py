@@ -105,7 +105,7 @@ def load_dof_data(file_path):
     print(f"Successfully loaded {len(dof_data)} actions from file")
     return dof_data
 
-def execute_dof_action(base, base_cyclic, dof_data):
+def execute_dof_action(base, base_cyclic, dof_data, type="arr"):
     """Execute actions from DOF data"""
     
     print(f"Starting to execute {len(dof_data)} DOF actions...")
@@ -131,12 +131,20 @@ def execute_dof_action(base, base_cyclic, dof_data):
         action.application_data = ""
         
         # Extract vectors from dof_data
-        world_vector = data['world_vector']
-        rotation_delta = data['rotation_delta']
-        gripper_state = data['open_gripper']
+
         
         # Set target pose
         cartesian_pose = action.reach_pose.target_pose
+        if type == "dict":
+            world_vector = data['world_vector']
+            rotation_delta = data['rotation_delta']
+            gripper_state = data['open_gripper']
+
+        elif type == "arr":
+            world_vector = data['world_vector']
+            rotation_delta = data['rotation_delta']
+            gripper_state = data['open_gripper']
+        
         cartesian_pose.x = initial_x + world_vector[0]
         cartesian_pose.y = initial_y + world_vector[1]
         cartesian_pose.z = initial_z + world_vector[2]
