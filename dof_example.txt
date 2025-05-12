@@ -1,4 +1,16 @@
-{'world_vector': array([0.020, 0.037, -0.007]), 'rotation_delta': array([0.058, -0.056, 0.050]), 'open_gripper': array([0.973])}
+{'world_vector': array([0.10, 0.0, 0.00]), 'rotation_delta': array([0.10, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.20, 0.0, 0.00]), 'rotation_delta': array([0.20, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.30, 0.0, 0.00]), 'rotation_delta': array([0.30, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.40, 0.0, 0.00]), 'rotation_delta': array([0.40, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.50, 0.0, 0.00]), 'rotation_delta': array([0.50, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.60, 0.0, 0.00]), 'rotation_delta': array([0.60, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.70, 0.0, 0.00]), 'rotation_delta': array([0.70, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.80, 0.0, 0.00]), 'rotation_delta': array([0.80, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.90, 0.0, 0.00]), 'rotation_delta': array([0.90, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.10, 0.0, 0.00]), 'rotation_delta': array([0.100, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.020, 0.0, 0.00]), 'rotation_delta': array([0.00, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.020, 0.0, 0.00]), 'rotation_delta': array([0.00, 0.0, 0.00]), 'open_gripper': array([0.0])}
+{'world_vector': array([0.020, 0.0, 0.00]), 'rotation_delta': array([0.00, 0.0, 0.00]), 'open_gripper': array([0.0])}
 {'world_vector': array([0.017, 0.024, -0.004]), 'rotation_delta': array([0.043, -0.054, 0.022]), 'open_gripper': array([1.000])}
 {'world_vector': array([0.031, 0.032, -0.012]), 'rotation_delta': array([0.085, -0.048, 0.036]), 'open_gripper': array([0.941])}
 {'world_vector': array([0.041, 0.040, -0.010]), 'rotation_delta': array([0.082, -0.055, 0.070]), 'open_gripper': array([0.957])}

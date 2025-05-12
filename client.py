@@ -40,7 +40,7 @@ def send_act(image: np.array, instruction: str):
               "unnorm_key":"roboturk"})
     
     print("Server says:", resp.json())
-    execute_dof_action(resp.json())
+    return resp.json()
 
 
 def crop_center_square(image):
@@ -75,6 +75,7 @@ def main():
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         sys.exit("camera can\'t open")
+    cap.release()
 
     # Parse arguments
     args = utilities.parseConnectionArguments()
@@ -100,9 +101,9 @@ def main():
                 instruction = "do something"
                 img = capture_and_process_image()
                 img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                send_act(img_rgb, instruction)
-                
-                time.sleep(interval)     
+                resp = send_act(img_rgb, instruction)
+                execute_dof_action(base, base_cyclic, resp)
+                time.sleep(3)     
         finally:
             cap.release()
 

@@ -5,6 +5,7 @@ import os
 import time
 import threading
 import numpy as np
+import math
 
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
@@ -122,78 +123,78 @@ def execute_dof_action(base, base_cyclic, dof_data, type="arr"):
     success_count = 0
     
     # Execute each action in sequence
-    for idx, data in enumerate(dof_data):
-        print(f"Executing action {idx+1}/{len(dof_data)}")
-        
-        # Create action object
-        action = Base_pb2.Action()
-        action.name = f"DOF Action {idx+1}"
-        action.application_data = ""
-        
-        # Extract vectors from dof_data
-
-        
-        # Set target pose
-        cartesian_pose = action.reach_pose.target_pose
-        if type == "dict":
-            world_vector = data['world_vector']
-            rotation_delta = data['rotation_delta']
-            gripper_state = data['open_gripper']
-
-        elif type == "arr":
-            world_vector = data['world_vector']
-            rotation_delta = data['rotation_delta']
-            gripper_state = data['open_gripper']
-        
-        cartesian_pose.x = initial_x + world_vector[0]
-        cartesian_pose.y = initial_y + world_vector[1]
-        cartesian_pose.z = initial_z + world_vector[2]
-        cartesian_pose.theta_x = initial_theta_x + rotation_delta[0]
-        cartesian_pose.theta_y = initial_theta_y + rotation_delta[1]
-        cartesian_pose.theta_z = initial_theta_z + rotation_delta[2]
-        
-        # Create event to wait for action completion
-        e = threading.Event()
-        notification_handle = base.OnNotificationActionTopic(
-            check_for_end_or_abort(e),
-            Base_pb2.NotificationOptions()
-        )
-        
-        # Execute the action
-        base.ExecuteAction(action)
-        
-        # Wait for action to complete
-        print("Waiting for movement to finish...")
-        finished = e.wait(TIMEOUT_DURATION)
-        base.Unsubscribe(notification_handle)
-        
-        if finished:
-            print(f"Action {idx+1} completed successfully")
-            success_count += 1
-        else:
-            print(f"Timeout on action {idx+1}")
-            
-        # Set gripper state
-        gripper_action = Base_pb2.GripperCommand()
-        gripper_action.mode = Base_pb2.GRIPPER_POSITION
-        
-        # Map gripper position from 0.0 (closed) to 1.0 (open)
-        if gripper_state > 0.9:  # If value > 0.9, consider it open
-            gripper_position = 1.0
-            print("Opening gripper")
-        else:
-            gripper_position = 1.0 - gripper_state  # Map value to closed state
-            print(f"Setting gripper position to {gripper_position}")
-            
-        finger = gripper_action.gripper.finger.add()
-        finger.finger_identifier = 0
-        finger.value = gripper_position
-        base.SendGripperCommand(gripper_action)
-        
-        # Brief delay to complete action
-        time.sleep(0.5)
+    #for idx, data in enumerate(dof_data):
+    print(f"Executing action ")
     
-    print(f"Completed {success_count}/{len(dof_data)} actions successfully")
+    # Create action object
+    action = Base_pb2.Action()
+    action.name = f"DOF Action "
+    action.application_data = ""
+    
+    # Extract vectors from dof_data
+
+    
+    # Set target pose
+    cartesian_pose = action.reach_pose.target_pose
+    if type == "dict":
+        world_vector = data['world_vector']
+        rotation_delta = data['rotation_delta']
+        gripper_state = data['open_gripper']
+
+    elif type == "arr":
+        world_vector = dof_data[:3]
+        rotation_delta = dof_data[3:6]
+        gripper_state = dof_data[6]
+    
+    cartesian_pose.x = initial_x + world_vector[0] * 10
+    cartesian_pose.y = initial_y + world_vector[1] * 10
+    cartesian_pose.z = initial_z + world_vector[2] * 10
+    cartesian_pose.theta_x = initial_theta_x + rotation_delta[0]* -math.pi *100
+    cartesian_pose.theta_y = initial_theta_y + rotation_delta[1]* -math.pi*100
+    cartesian_pose.theta_z = initial_theta_z + rotation_delta[2]* -math.pi*100
+    
+    # Create event to wait for action completion
+    e = threading.Event()
+    notification_handle = base.OnNotificationActionTopic(
+        check_for_end_or_abort(e),
+        Base_pb2.NotificationOptions()
+    )
+    
+    # Execute the action
+    base.ExecuteAction(action)
+    
+    # Wait for action to complete
+    print("Waiting for movement to finish...")
+    finished = e.wait(TIMEOUT_DURATION)
+    base.Unsubscribe(notification_handle)
+    
+    if finished:
+        #print(f"Action {idx+1} completed successfully")
+        success_count += 1
+    else:
+        print(f"Timeout on action")
+        
+    # Set gripper state
+    gripper_action = Base_pb2.GripperCommand()
+    gripper_action.mode = Base_pb2.GRIPPER_POSITION
+    
+    # Map gripper position from 0.0 (closed) to 1.0 (open)
+    if gripper_state > 0.9:  # If value > 0.9, consider it open
+        gripper_position = 1.0
+        print("Opening gripper")
+    else:
+        gripper_position = 1.0 - gripper_state  # Map value to closed state
+        print(f"Setting gripper position to {gripper_position}")
+        
+    finger = gripper_action.gripper.finger.add()
+    finger.finger_identifier = 0
+    finger.value = gripper_position
+    base.SendGripperCommand(gripper_action)
+    
+    # Brief delay to complete action
+    #time.sleep(0.5)
+    
+    #print(f"Completed {success_count}/{len(dof_data)} actions successfully")
     return success_count == len(dof_data)
 
 def main():
