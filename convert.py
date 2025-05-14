@@ -131,27 +131,25 @@ def execute_dof_action(base, base_cyclic, dof_data, type="arr"):
     action.name = f"DOF Action "
     action.application_data = ""
     
-    # Extract vectors from dof_data
-
-    
     # Set target pose
     cartesian_pose = action.reach_pose.target_pose
+     # Extract vectors from dof_data
     if type == "dict":
-        world_vector = data['world_vector']
-        rotation_delta = data['rotation_delta']
-        gripper_state = data['open_gripper']
+        world_vector   = dof_data['world_vector']   
+        rotation_delta = dof_data['rotation_delta'] 
+        gripper_state  = dof_data['open_gripper']
 
     elif type == "arr":
         world_vector = dof_data[:3]
         rotation_delta = dof_data[3:6]
         gripper_state = dof_data[6]
     
-    cartesian_pose.x = initial_x + world_vector[0] * 10
-    cartesian_pose.y = initial_y + world_vector[1] * 10
-    cartesian_pose.z = initial_z + world_vector[2] * 10
-    cartesian_pose.theta_x = initial_theta_x + rotation_delta[0]* -math.pi *100
-    cartesian_pose.theta_y = initial_theta_y + rotation_delta[1]* -math.pi*100
-    cartesian_pose.theta_z = initial_theta_z + rotation_delta[2]* -math.pi*100
+    cartesian_pose.x = initial_x + world_vector[0]
+    cartesian_pose.y = initial_y + world_vector[1]
+    cartesian_pose.z = initial_z + world_vector[2]
+    cartesian_pose.theta_x = initial_theta_x + math.degrees(rotation_delta[0])
+    cartesian_pose.theta_y = initial_theta_y + math.degrees(rotation_delta[1])
+    cartesian_pose.theta_z = initial_theta_z + math.degrees(rotation_delta[2])
     
     # Create event to wait for action completion
     e = threading.Event()
@@ -175,24 +173,13 @@ def execute_dof_action(base, base_cyclic, dof_data, type="arr"):
         print(f"Timeout on action")
         
     # Set gripper state
-    gripper_action = Base_pb2.GripperCommand()
-    gripper_action.mode = Base_pb2.GRIPPER_POSITION
-    
-    # Map gripper position from 0.0 (closed) to 1.0 (open)
-    if gripper_state > 0.9:  # If value > 0.9, consider it open
-        gripper_position = 1.0
-        print("Opening gripper")
-    else:
-        gripper_position = 1.0 - gripper_state  # Map value to closed state
-        print(f"Setting gripper position to {gripper_position}")
-        
-    finger = gripper_action.gripper.finger.add()
+    gripper_cmd = Base_pb2.GripperCommand()
+    gripper_cmd.mode = Base_pb2.GRIPPER_POSITION
+    finger = gripper_cmd.gripper.finger.add()
     finger.finger_identifier = 0
-    finger.value = gripper_position
-    base.SendGripperCommand(gripper_action)
-    
-    # Brief delay to complete action
-    #time.sleep(0.5)
+    finger.value = gripper_state
+
+    base.SendGripperCommand(gripper_cmd)
     
     #print(f"Completed {success_count}/{len(dof_data)} actions successfully")
     return success_count == len(dof_data)
